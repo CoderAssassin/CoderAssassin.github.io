@@ -1,12 +1,12 @@
 ---
 layout:     post
 title:      "ConcurrentHashMap详解"
-subtitle:   " java并发"
+subtitle:   " java并发编程实战 "
 date:       2018-07-16 17:00:00
 author:     "Aliyang"
 header-img: "img/post-bg-2015.jpg"
 tags:
-    - 生活
+    - Java基础
 ---
 # ConcurrentHashMap理解
 
