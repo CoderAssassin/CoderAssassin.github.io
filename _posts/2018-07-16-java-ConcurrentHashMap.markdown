@@ -16,6 +16,7 @@ tags:
 ConcurrentHashMap在JDK 1.6、1.7和1.8有差别，尤其是JDK 1.8版本变化较大，JDK 1.6、1.7版本都是采用的分段锁(Segment (继承ReentrantLock))来实现对部分数据加锁，而在1.8中，进行了重新设计，加入了Node、TreeNode和TreeBin等数据结构。
 ## 预知识：HashMap
 基本数据结构使用Entry，创建一个Entry数组，每个位置处是一个链表。
+
 ``` java
 static class Entry<K,V> implements Map.Entry<K,V> {
         final K key;
@@ -24,6 +25,7 @@ static class Entry<K,V> implements Map.Entry<K,V> {
         int hash;
         }
         ```
+
 当出现哈希碰撞的时候，采用链地址法解决冲突。
 1.7版本使用的是链表，1.8版本使用的是红黑树，当节点个数大于8个的时候，转换为红黑树。
 > 允许一个key为null，value为null的Entry，放到位置0处。
@@ -32,6 +34,7 @@ static class Entry<K,V> implements Map.Entry<K,V> {
 ### 总体设计
 ![concurrentHashMap1](https://github.com/CoderAssassin/markdownImg/blob/master/concurrentHashmap.png?raw=true "concurrentHashMap1.6/1.7")
 采用分段锁的设计，同一个分段内的数据存在竞争，不同分段内的数据不存在竞争，并没有对整个Map数组进行加锁。ConcurrentHashMap存储有多个分段锁，每个分段锁内部有一个数组，数组的每个元素是HashEntry，从数组的元素的next指针找下去形成一条链表。
+
 ``` java
 static final class HashEntry<K,V> {
         final int hash;
@@ -40,6 +43,7 @@ static final class HashEntry<K,V> {
         volatile HashEntry<K,V> next;
         }
         ```
+
 > key和value不能为null，若为null说明当前线程没有处理完而被其他线程看到。
 
 ### 重要参数
@@ -57,6 +61,7 @@ static final class HashEntry<K,V> {
 
 ### rehash
 扩容都是针对某个Segment的HashEntry进行扩容，当加入HashEntry超出数组阈值threshold会进行扩容。假设扩容前某个HashEntry在其所在的Segment的HashEntry数组的索引为i，那么扩容后的新的数组的索引为i(个人理解：扩容是前面的Segment进行了扩容，该Segment没有进行扩容)或者i+capacity(扩容两倍)，大部分HashEntry的index可以保持不变，找到第一个index不变的HashEntry，和前面的节点重排。
+
 ``` java
 private void rehash(HashEntry<K,V> node) {
            HashEntry<K,V>[] oldTable = table;
@@ -103,6 +108,7 @@ private void rehash(HashEntry<K,V> node) {
            table = newTable;
        }
        ```
+
 ### 创建Segment数组
 采用**延迟初始化机制**。先初始化数组第一个Segment，put的时候检查Segment是否为null，是的话调用ensureSegment()创建。
 
