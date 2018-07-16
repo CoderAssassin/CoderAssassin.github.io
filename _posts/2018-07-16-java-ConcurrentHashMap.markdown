@@ -9,7 +9,9 @@ tags:
     - 生活
 ---
 # ConcurrentHashMap理解
+
 [TOC]
+
 这几天看了一些关于ConcurrentHashMap的文章，加深了理解，写篇简短的总结记录一下，免得下一次又得再找别人的文章。
 ConcurrentHashMap在JDK 1.6、1.7和1.8有差别，尤其是JDK 1.8版本变化较大，JDK 1.6、1.7版本都是采用的分段锁(Segment (继承ReentrantLock))来实现对部分数据加锁，而在1.8中，进行了重新设计，加入了Node、TreeNode和TreeBin等数据结构。
 ## 预知识：HashMap
