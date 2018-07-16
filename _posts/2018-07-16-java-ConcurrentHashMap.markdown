@@ -33,14 +33,12 @@ ConcurrentHashMap在JDK 1.6、1.7和1.8有差别，尤其是JDK 1.8版本变化�
 ![concurrentHashMap1](https://github.com/CoderAssassin/markdownImg/blob/master/concurrentHashmap.png?raw=true "concurrentHashMap1.6/1.7")
 采用分段锁的设计，同一个分段内的数据存在竞争，不同分段内的数据不存在竞争，并没有对整个Map数组进行加锁。ConcurrentHashMap存储有多个分段锁，每个分段锁内部有一个数组，数组的每个元素是HashEntry，从数组的元素的next指针找下去形成一条链表。
 
-`
-static final class HashEntry<K,V> {
+`static final class HashEntry<K,V> {
         final int hash;
         final K key;
         volatile V value;
         volatile HashEntry<K,V> next;
-        }
-`
+        }`
 
 > key和value不能为null，若为null说明当前线程没有处理完而被其他线程看到。
 
@@ -60,8 +58,7 @@ static final class HashEntry<K,V> {
 ### rehash
 扩容都是针对某个Segment的HashEntry进行扩容，当加入HashEntry超出数组阈值threshold会进行扩容。假设扩容前某个HashEntry在其所在的Segment的HashEntry数组的索引为i，那么扩容后的新的数组的索引为i(个人理解：扩容是前面的Segment进行了扩容，该Segment没有进行扩容)或者i+capacity(扩容两倍)，大部分HashEntry的index可以保持不变，找到第一个index不变的HashEntry，和前面的节点重排。
 
-`
-private void rehash(HashEntry<K,V> node) {
+`private void rehash(HashEntry<K,V> node) {
            HashEntry<K,V>[] oldTable = table;
            int oldCapacity = oldTable.length;
            int newCapacity = oldCapacity << 1;
@@ -104,8 +101,7 @@ private void rehash(HashEntry<K,V> node) {
            node.setNext(newTable[nodeIndex]);
            newTable[nodeIndex] = node;
            table = newTable;
-       }
-`
+       }`
 
 ### 创建Segment数组
 采用**延迟初始化机制**。先初始化数组第一个Segment，put的时候检查Segment是否为null，是的话调用ensureSegment()创建。
