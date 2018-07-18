@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      "ConcurrentHashMap详解"
-subtitle:   " java并发编程实战 "
+title:      "Jvm内存区域"
+subtitle:   " jvm内存 "
 date:       2018-07-17 15:27:00
 author:     "Aliyang"
 header-img: "img/post-bg-2015.jpg"
