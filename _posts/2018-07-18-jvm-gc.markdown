@@ -6,7 +6,7 @@ date:       2018-07-18 11:00:00
 author:     "Aliyang"
 header-img: "img/post-bg-2015.jpg"
 tags:
-    - jvm
+    - JVM
 ---
 [TOC]
 ## 对象死亡回收

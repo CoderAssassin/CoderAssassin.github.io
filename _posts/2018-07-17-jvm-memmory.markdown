@@ -6,7 +6,7 @@ date:       2018-07-17 15:27:00
 author:     "Aliyang"
 header-img: "img/post-bg-2015.jpg"
 tags:
-    - Jvm
+    - JVM
 ---
 ## Java内存区域
 [TOC]
