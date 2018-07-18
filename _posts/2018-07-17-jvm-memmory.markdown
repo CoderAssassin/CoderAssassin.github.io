@@ -4,7 +4,7 @@ title:      "Jvm内存区域"
 subtitle:   " jvm内存 "
 date:       2018-07-17 15:27:00
 author:     "Aliyang"
-header-img: "img/post-bg-2015.jpg"
+header-img: "img/post-bg-jvm-memory.jpg"
 tags:
     - JVM
 ---

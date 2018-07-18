@@ -6,7 +6,7 @@ date:       2018-07-18 10:00:00
 author:     "Aliyang"
 header-img: "img/post-db-transaction.jpg"
 tags:
-    - 数据库
+    - database
 ---
 [TOC]
 ## 数据库中的事务和并发问题

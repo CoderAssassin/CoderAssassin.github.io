@@ -4,9 +4,9 @@ title:      "ConcurrentHashMap详解"
 subtitle:   " java并发编程实战 "
 date:       2018-07-16 17:00:00
 author:     "Aliyang"
-header-img: "img/post-bg-2015.jpg"
+header-img: "img/post-bg-db-concurrent.jpg"
 tags:
-    - Java基础
+    - Java
 ---
 # ConcurrentHashMap理解
 
