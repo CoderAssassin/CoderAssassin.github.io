@@ -8,7 +8,6 @@ header-img: "img/post-db-transaction.jpg"
 tags:
     - database
 ---
-[TOC]
 ## 数据库中的事务和并发问题
 
 #### 并发问题

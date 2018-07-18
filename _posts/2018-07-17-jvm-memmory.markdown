@@ -9,7 +9,6 @@ tags:
     - JVM
 ---
 ## Java内存区域
-[TOC]
 Java虚拟机运行时管理的内存区域分为如下几个区域。
 ![javaMemory](https://github.com/CoderAssassin/markdownImg/blob/master/JavaVM/JavaMemory.png?raw=true)
 

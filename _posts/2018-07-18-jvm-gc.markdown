@@ -8,7 +8,6 @@ header-img: "img/post-bg-jvm-gc.jpg"
 tags:
     - JVM
 ---
-[TOC]
 ## 对象死亡回收
 #### 对象死亡判断
 * 引用计数法
