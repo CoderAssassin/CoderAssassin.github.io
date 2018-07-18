@@ -4,7 +4,7 @@ title:      "数据库事务并发问题"
 subtitle:   " 事务并发 "
 date:       2018-07-18 10:00:00
 author:     "Aliyang"
-header-img: "img/post-bg-2015.jpg"
+header-img: "img/post-db-transaction.jpg"
 tags:
     - 数据库
 ---
