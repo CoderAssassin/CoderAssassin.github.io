@@ -7,6 +7,8 @@ author:     "Aliyang"
 header-img: "img/post-bg-concurrent-basemodel.jpg"
 tags:
     - java并发
+---
+
 ## 同步容器类
 如Vector和Hashtable，以及JDK1.2添加的功能类似的类，都是由Collections.synchronizedXxx等工厂方法创建的。
 实现线程安全的方式：将它们的状态封装起来，并对每个公有方法都进行同步，使得每次只有一个线程能访问容器的状态。
@@ -44,10 +46,10 @@ public static void deleteLast(Vector list){
 
 3. 在调用size和get之间，Vector的长度仍然可能会发生变化，这种风险在对Vector中的元素迭代时仍然会出现(这里假设在迭代的过程中删除元素，那么size()会跟着变化，get(i)得到的值并不是预期的值)，可以在迭代期间持有Vector锁，但会牺牲一定的伸缩性。
 ``` java
-下面代码当迭代过程中删除对象时，会出现ArrayIndexOutOfBoundsException异常。
+//下面代码当迭代过程中删除对象时，会出现ArrayIndexOutOfBoundsException异常。
 for(int i=0;i<vector.size();i++)
 	doSomething(vector.get(i));
-下面对整个vector加锁，防止结构被修改:
+//下面对整个vector加锁，防止结构被修改:
 synchronized(vector){
     for(int i=0;i<vector.size();i++)
         doSomething(vector.get(i));
