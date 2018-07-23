@@ -138,7 +138,6 @@ Executor框架帮助指定执行策略，但如果要使用Executor，必须将�
 //例如：使用Future实现一边下载图像一边渲染图像
 public abstract class FutureRenderer {
     private final ExecutorService executor = Executors.newCachedThreadPool();
-
     void renderPage(CharSequence source) {
         final List<ImageInfo> imageInfos = scanForImageInfo(source);
         Callable<List<ImageData>> task =
