@@ -133,6 +133,7 @@ Executor框架帮助指定执行策略，但如果要使用Executor，必须将�
 * 多种方法创建一个Future描述任务：
 	* ExecutorService中的所有submit方法都将返回一个Future，从而将一个Runnable或Callable提交给Executor，并得到一个Future用来获得任务的执行结果或者取消任务。
 	* 显式地为某个指定的Runnable或Callable实例化一个FutureTask。
+
 ``` java
 //例如：使用Future实现一边下载图像一边渲染图像
 public abstract class FutureRenderer {
