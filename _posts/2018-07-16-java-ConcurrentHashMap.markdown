@@ -127,7 +127,7 @@ private void rehash(HashEntry<K,V> node) {
 ## JDK 1.8的设计
 ![concurrentHashMap1.8](https://github.com/CoderAssassin/markdownImg/blob/master/concurrentHashMap1.png?raw=true "concurrentHashMap1.8")
 
-去掉Segment，采用Nodpe，TreeNode，TreeBin等数据结构，底层采用数组/链表/红黑树的设计。
+去掉Segment，采用Node，TreeNode，TreeBin等数据结构，底层采用数组/链表/红黑树的设计。
 
 #### 重要参数
 * sizeCtl(控制标识符)
