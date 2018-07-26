@@ -118,8 +118,8 @@ public class WithinThreadExecutor implements Executor {
 
 5. 延迟任务与周期任务
 	* 用ScheduledThreadPoolExecutor代替Timer，可以通过构造函数或者newScheduledThreadPool工厂方法来创建该类的对象。
-		*　Timer执行所有定时任务只能创建一个线程，如果某个任务的执行时间过长，那么将破坏其他TimerTask的定时精确性。
-		*　如果TimerTask抛出一个未检查的异常，将表现出糟糕的行为。Timer线程并不捕获异常，因此当TimerTask抛出未检查的异常时将终止定时线程，会错误认为整个Timer都被取消，TimerTask将不会再执行，新的任务也不能调度。
+		* Timer执行所有定时任务只能创建一个线程，如果某个任务的执行时间过长，那么将破坏其他TimerTask的定时精确性。
+		* 如果TimerTask抛出一个未检查的异常，将表现出糟糕的行为。Timer线程并不捕获异常，因此当TimerTask抛出未检查的异常时将终止定时线程，会错误认为整个Timer都被取消，TimerTask将不会再执行，新的任务也不能调度。
 	* DelayQueue
 		* 实现了BlockingQueue，为ScheduledThreadPoolExecutor提供调度功能。每个对象有一个相应的延迟时间，逾期后才能从DelayQueue执行take操作。
 
