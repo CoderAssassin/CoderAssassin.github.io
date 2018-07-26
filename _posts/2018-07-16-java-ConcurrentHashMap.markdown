@@ -46,12 +46,12 @@ static final class HashEntry<K,V> {
 
 ### 重要参数
 * ConcurrentLevel(并发度)
-并发度就是锁的个数，一经指定不可改变。ConcurrentHashMap的<font color=red>默认并发度为16</font>，如果创建的时候用户自定义并发度，那么创建后的并发度为<font color=red>大于等于用户并发度的最小2次幂值</font>(比如自定义17最后是32)。之所以取2的幂值是因为可以直接进行位运算来扩容。
+并发度就是锁的个数，一经指定不可改变。ConcurrentHashMap的默认并发度为16，如果创建的时候用户自定义并发度，那么创建后的并发度为大于等于用户并发度的最小2次幂值(比如自定义17最后是32)。之所以取2的幂值是因为可以直接进行位运算来扩容。
 并发度太小，竞争大；并发度太大，CPU cache命中率下降。
 * initialCapacity
-决定每个Segment数组的大小，<font color=red>默认为16</font>。
+决定每个Segment数组的大小，默认为16。
 * loadfactor
-负载因子，<font color=red>默认为0.75</font>，和initialCapacity一起决定了数组的大小。
+负载因子，默认为0.75，和initialCapacity一起决定了数组的大小。
 * segmentShift
 分段锁数组的偏移，用于定位参与hash运算的位数，sshift是分段锁数组大小ssize从1往左移动的位数，32-sshift=segmentShift。因为分段锁数组大小最大16位(65535)，所以segmentShift最大也是65535。
 * segmentMask
@@ -60,7 +60,7 @@ static final class HashEntry<K,V> {
 ### rehash
 扩容都是针对某个Segment的HashEntry进行扩容，当加入HashEntry超出数组阈值threshold会进行扩容。假设扩容前某个HashEntry在其所在的Segment的HashEntry数组的索引为i，那么扩容后的新的数组的索引为i(个人理解：扩容是前面的Segment进行了扩容，该Segment没有进行扩容)或者i+capacity(扩容两倍)，大部分HashEntry的index可以保持不变，找到第一个index不变的HashEntry，和前面的节点重排。
 
-```
+``` java
 private void rehash(HashEntry<K,V> node) {
            HashEntry<K,V>[] oldTable = table;
            int oldCapacity = oldTable.length;
