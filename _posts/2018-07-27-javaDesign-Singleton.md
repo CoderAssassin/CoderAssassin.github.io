@@ -114,5 +114,5 @@ public class Singleton{
 
 
 ## Reference
-[1.Java单例模式——并非看起来那么简单](https://blog.csdn.net/goodlixueyong/article/details/51935526)
-[2.java设计模式之 单例模式](https://www.cnblogs.com/kuoAT/p/6725808.html)
+* [1.Java单例模式——并非看起来那么简单](https://blog.csdn.net/goodlixueyong/article/details/51935526)
+* [2.java设计模式之 单例模式](https://www.cnblogs.com/kuoAT/p/6725808.html)
