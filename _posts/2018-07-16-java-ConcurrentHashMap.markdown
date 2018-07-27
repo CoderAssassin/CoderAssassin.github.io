@@ -12,6 +12,9 @@ tags:
 
 这几天看了一些关于ConcurrentHashMap的文章，加深了理解，写篇简短的总结记录一下，免得下一次又得再找别人的文章。
 ConcurrentHashMap在JDK 1.6、1.7和1.8有差别，尤其是JDK 1.8版本变化较大，JDK 1.6、1.7版本都是采用的分段锁(Segment (继承ReentrantLock))来实现对部分数据加锁，而在1.8中，进行了重新设计，加入了Node、TreeNode和TreeBin等数据结构。
+
+> 设计ConcurrentHashMap的动机：在高并发的环境下，如果使用的是HashMap，当多条线程同时进行rehash的时候，容易出现链表成环的现象。具体参考博客：[hashmap的问题](https://blog.csdn.net/dgutliangxuan/article/details/78779448)
+
 ## 预知识：HashMap
 基本数据结构使用Entry，创建一个Entry数组，每个位置处是一个链表。
 
