@@ -83,3 +83,7 @@ public class King extends Role {
 ```
 
 上述代码中，角色的武器部分被剥离出来，通过类似简单的接口模式实现，对于不同的角色的不同武器，通过传入不同的武器对象就可以。
+
+## Reference
+
+* [[设计模式之一策略模式](https://www.cnblogs.com/dotgua/p/strategy-pattern.html)]
