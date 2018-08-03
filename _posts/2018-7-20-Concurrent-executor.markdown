@@ -100,23 +100,46 @@ public class WithinThreadExecutor implements Executor {
 	* 如果系统由于过载而需要拒绝一个任务，那么应该选择哪一个(Which)任务?另外，如何(How)通知应用程序有任务被拒绝?
 	* 在执行一个任务之前或之后，应该进行哪些(What )动作?
 
-3. 线程池
+3. 线程池的主要参数
+	* corePoolSize：核心线程池大小
+	* maximumPoolSize：最大线程池大小
+	* keepAliveTime：线程中线程数超过corePoolSize后空闲线程的最大存活时间；若设置allowCoreThreadTimeOut(true)那么线程数少于corePoolSize后也会有回收时间
+	* TimeUnit：keepAliveTime时间单位
+	* workQueue：阻塞队列
+	* threadQueue：新建线程工厂
+	* RejectedExecutionHandler：当提交任务数超过corePoolSize+maximumPoolSize和的时候，任务交给RejectedExecutionHandler来处理
+4. 线程池
 	* 指管理一组同构工作线程的资源池。
 	* 线程池与工作队列密切相关，在工作队列中保存了所有等待执行的任务。
 	* 可以通过调用Executors中的静态工厂方法之一来创建线程池：
 		* newFixedThreadPool：创建固定长度线程池，每提交一个任务创建一个线程，直到最大数量。
+			* 用一个无界队列LinkedBlockQueue存储提交的任务，因此多余的任务会一直存放再队列中，而不是创建新的线程。
+			* corePoolSize=maximumPoolSize
 		* newCachedThreadPool：创建可缓存的线程池，如果线程池的当前规模超过了处理需求时，那么将回收空闲的线程，而当需求增加时，则可以添加新的线程，线程池的规模不存在任何限制。
+			* 用一个无容量的SynchronizedQueue来保存任务，所以任务进来不会进队列，直接创建新的线程。
+			* corePoolSize=0,maximumPoolSize=最大整数，keepAliveTime=60s，新的任务进来以后都是新创建一个线程，空闲线程达到60秒后直接回收
 		* newSingleThreadExecutor：单线程的Executor，创建单个工作者线程来执行任务，如果这个线程异常结束，会创建另一个线程来替代。
+			* corePoolSize=maximumPoolSize=1，用无界队列LinkedBlockingQueue来保存任务，所以每次都只有一个任务在执行。
 		* newScheduledThreadPool：创建固定长度线程池，且以延迟或定时的方式执行任务，类似Timer。
+			* 用无界延迟队列DelayedWorkQueue来保存任务
+			* maximumPoolSize=最大整数，但是这个数没有意义，因为任务队列是无界队列，当线程数达到corePoolSize后会一直保持这个数，多的任务保存在队列里。
 
-4. Executor的生命周期
+5. 线程池的运行流程
+	* 当线程池的线程数小于corePoolSize时，新提交的任务都会创建一个新的线程来执行，即使线程池中现在有空闲的线程。
+	* 当线程池的线程数达到corePoolSize后，新提交的任务会被放到阻塞队列中，等待线程池中任务调度进行。
+	* 如果任务队列满了，并且maximumPoolSize>corePoolSize，那么就会继续创建新的线程来执行任务，直到线程数达到maximumPoolSize。
+	* 当任务数超过maximumPoolSize后，那么新提交的任务由RejectedExecutionHandler处理。
+	* 当线程池中线程数超过corePoolSize后，若空闲线程空闲时间达到keepAliveTime后，那么会关闭该空闲线程。
+	* 如果设置allowCoreThreadTimeOut(true)，那么线程数小于corePoolSize时，空闲线程达到keepAliveTime也将关闭。
+
+6. Executor的生命周期
 	* Executor的实现通常会创建线程来执行任务，但JVM只有在所有(非守护)线程全部终止后才会退出，如果无法正确地关闭Executor，那么JVM将无法结束。
 	* ExecutorService接口继承自Executor，添加了一些用于声明周期管理的方法。
 		* 生命周期有3种状态：运行、关闭和已终止。
 		* 关闭后提交的任务将由**“拒绝执行处理器”**处理，抛弃任务或者使得execute方法抛出一个未检查的**RejectedExecutionException**，等所有任务完成后，进入终止状态。
 		* **awaitTermination**等待到达终止，**isTerminated**轮询**ExecutorService**是否已经终止。
 
-5. 延迟任务与周期任务
+7. 延迟任务与周期任务
 	* 用ScheduledThreadPoolExecutor代替Timer，可以通过构造函数或者newScheduledThreadPool工厂方法来创建该类的对象。
 		* Timer执行所有定时任务只能创建一个线程，如果某个任务的执行时间过长，那么将破坏其他TimerTask的定时精确性。
 		* 如果TimerTask抛出一个未检查的异常，将表现出糟糕的行为。Timer线程并不捕获异常，因此当TimerTask抛出未检查的异常时将终止定时线程，会错误认为整个Timer都被取消，TimerTask将不会再执行，新的任务也不能调度。
