@@ -6,7 +6,7 @@ date:       2018-07-27 11:00:00
 author:     "Aliyang"
 header-img: "img/post-bg-java-StringMethod.jpg"
 tags:
-    - java
+    - Java
 ---
 ## String的subString()方法
 ``` java
