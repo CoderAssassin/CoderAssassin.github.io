@@ -98,3 +98,39 @@ tags:
 指类加载器之间的层次关系，双亲委派模型要求除了顶层的启动类加载器外，其余的类加载器都应当有自己的父类加载器，使用组合关系来复用父加载器的代码。
 工作过程：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此，因此所有的加载请求最终都应该传送到顶层的启动类加载器中，只有当父加载器反馈自己无法完成这个加载请求（它的搜索范围中没有找到所需的类）时，子加载器才会尝试自己去加载。
 ![类加载器](https://github.com/CoderAssassin/markdownImg/blob/master/JavaVM/ClassLoader.png?raw=true)
+
+## Tomcat类加载器
+#### 主要的类加载器
+借用引文博客的图片一用。
+![tomcat_classloader](https://github.com/CoderAssassin/markdownImg/blob/master/JavaVM/tomcat_classloader.jpg?raw=true)
+tomcat的类加载器和Java虚拟机的类加载器有些不同，tomcat的类加载器主要有如下几个：
+
+* Bootstrap引导类加载器：加载JVM运行的类，即jre/lib/root.rar以及标准扩展类jre/lib/ext中的类包。
+* System系统类加载器：加载tomcat启动的类，如CATALINA_HOME/bin下的bootstrap.jar。
+* Common通用类加载器：加载tomcat使用以及应用通用的一些类，在CATALINA_HOME/lib下，如servlet-api.jar
+* webapp应用类加载器：每个应用部署后会有一个唯一的类加载器，加载位于WEB-INF/lib下的以及WEB-INF/classes下的class文件
+
+#### 类加载顺序
+* bootstrap类加载器加载
+* system类加载器加载
+* 用webapp应用类加载器先加载WEB-INF/classes中类，然后是WEB-INF/lib中的类
+* 使用common类加载CATALINA_HOME/lib中的类
+
+## OSGI类加载器
+(Open Service Gateway Initiative)OSGI技术是Java动态化模块化系统的一系列规范。OSGI真正意义上实现了解耦，以往的类似SSH的框架，虽然说逻辑上达到了解耦，但是实际物理上并没有解耦，当一个完整的项目上线后，我们去掉其中的一个模块，那么项目是没法运行了。而OSGI即使去掉了一个模块，也能继续运行。
+#### OSGI类加载和Java类加载的区别
+Java类加载器是分层次的结构，而OSGI是一种网状的结构。OSGI将所有类分成很多个Bundle，每个Bundle有一个类加载器，假设A，B两个Bundle里的类调用Bundle C里边的类，那么Bundle A和B会将类加载委托给Bundle C
+的类加载器来加载，以此类推。
+#### 类加载步骤
+* 先检查要加载的类是否以java.*开头，或者是否在org.osgi.framework.bootdelegation中定义，是的话，那么委托给父类加载器，一般是委托给Application类加载器，因为这些类需要Bootstrap类加载器来加载。
+* 检查要加载的类是否在**Import-Package**中声明，是的话，找到对应的包的Bundle的类加载器来加载。
+* 检查要加载的类是否在**Require-Bundle**中声明，是的话，将类加载请求委托给对应的Bundle的类加载器加载。
+* 检查要加载的类是否是当前类所在jar包的内部的类，是的话调用类加载器
+* 检查要加载的类是否在附加在当前bundle上的fragment中的内部类，那么调用对应的fragment的类加载器加载。
+* 检查要加载的类是否在Dynamic Import列表的Bundle中，是的话委托给对应的Bundle类加载器加载
+* 如果上面的情况都不满足，那么类加载失败
+
+
+## Reference
+* [https://www.cnblogs.com/xing901022/p/4574961.html](https://www.cnblogs.com/xing901022/p/4574961.html)
+* [https://blog.csdn.net/vking_wang/article/details/12875619](https://blog.csdn.net/vking_wang/article/details/12875619)
