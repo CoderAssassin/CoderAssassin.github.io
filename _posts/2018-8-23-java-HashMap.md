@@ -178,7 +178,6 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     }
 ```
 上述putVal()方法的总体过程是这样的，首先判断表是否是空的，是的话要初始化。然后是两种情况，一是待插入的key在数组中的位置的元素为null，那么直接创建新的节点插入；二是不为null，此时分为3种情况，若数组对应元素的第一个节点就是key对应的节点，那么e设为该节点，若数组对应元素是棵树，那么按树的方式put，若是链表，那么遍历链表，找到是否有相同的节点，如果有那么e指向该节点，没有的话在尾部插入新的节点，然后e为null，对于e非null的情况(即原来就有对应的key的节点)，若onlyIfAbsent=false那么更新旧值。最终，判断是否需要扩容，是的话再进行扩容。
-
 接下来，再看一下关键的初始化和扩容方法resize()：
 ``` java
 final Node<K,V>[] resize() {
