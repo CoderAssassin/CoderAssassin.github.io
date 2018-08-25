@@ -8,7 +8,6 @@ header-img: "img/post-bg-concurrent-cap.jpg"
 tags:
     - java并发
 ---
-[TOC]
 ## 关系数据库事务
 关系数据库需要满足ACID这4个特性：
 
