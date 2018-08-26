@@ -184,6 +184,13 @@ refresh()方法其实实在AbstractApplicationContext这个抽象类里实现的
 		return beanFactory;
 	}
 ```
+#### 时序图
+![IOC_ResourcePosition](https://github.com/CoderAssassin/markdownImg/blob/master/Spring/IOC_ResourcePosition.png?raw=true)
+上图是大致的Resource定位时序图，DefaultListableBeanFactory是在AbstractRefreshableApplicationContext创建的，XmlBeanDefinitionReader是在AbstractXmlApplicationContext创建的。在XmlBeanDefinitionReader里，对资源的获取有两个过程，一个是直接获取到当前环境的所有Resource对象数组，还有一种是获取到资源的位置String数组，这就需要定位到String表示的位置然后加载配置文件为Resource对象。
+![IOC_BeanLoader](https://github.com/CoderAssassin/markdownImg/blob/master/Spring/IOC_BeanLoader.png?raw=true)
+上图是对Resource的加载和解析的大致流程，具体的对不同标签的解析是再BeanDefinitionParserDelegate里边进行，当BeanDefinition加载完成后需要注册到IOC容器里：
+![IOC_BeanRegister](https://github.com/CoderAssassin/markdownImg/blob/master/Spring/IOC_BeanRegister.png?raw=true)
+注册最终是回到DefaultListableBeanFactory里，以beanName为键，BeanDefinition为值存储到Map中。
 
 #### Resource定位、加载、解析和注册
 上述的obtainFreshBeanFactory()主要是获取BeanFactory，里边的refreshBeanFactory()是一个抽象方法，在子类**AbstractRefreshableApplicationContest**中实现：
