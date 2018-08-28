@@ -19,7 +19,8 @@ static class Entry<K,V> implements Map.Entry<K,V> {
         Entry<K,V> next;
         int hash;
         }
-        ```
+```
+
 当出现哈希碰撞的时候，采用链地址法解决冲突。
 1.7版本使用的是链表，1.8版本使用的是红黑树，当节点个数大于8个的时候，转换为红黑树。
 > 允许一个key为null，value为null的Entry，放到位置0处。
