@@ -36,7 +36,8 @@ static final class HashEntry<K,V> {
         volatile V value;
         volatile HashEntry<K,V> next;
         }
-        ```
+```
+
 > key和value不能为null，若为null说明当前线程没有处理完而被其他线程看到。
 
 ### 重要参数
