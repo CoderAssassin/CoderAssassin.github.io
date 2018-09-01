@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "处理机调度"
-subtitle:   " java "
+subtitle:   " 处理机调度 "
 date:       2018-09-01 19:40:00
 author:     "Aliyang"
 header-img: "img/post-bg-OS-ProcessScheduling.jpg"
