@@ -15,8 +15,8 @@ Fork/Join框架是Executor框架的一种特殊的实现，那么有什么区别
 主要区别在于Fork/Join框架使用的是**工作窃取算法(work-stealing)**。在Fork/Join中，每个工作线程都有一条自己的双端队列，新的任务插入队列头，当某条工作线程的任务执行完毕，这个时候，会从别的工作线程的双端队列尾部“窃取”一个任务来执行。
 
 ## Fork/Join的实现原理
-
 ###　Fork/Join的结构
+
 Fork/Join框架主要由如下两部分组成：
 
 * ForkJoinPool：即Fork/Join的线程池，是AbstractExecutorService抽象类的一个子类。
