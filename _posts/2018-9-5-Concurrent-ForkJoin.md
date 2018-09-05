@@ -15,7 +15,8 @@ Fork/Join框架是Executor框架的一种特殊的实现，那么有什么区别
 主要区别在于Fork/Join框架使用的是**工作窃取算法(work-stealing)**。在Fork/Join中，每个工作线程都有一条自己的双端队列，新的任务插入队列头，当某条工作线程的任务执行完毕，这个时候，会从别的工作线程的双端队列尾部“窃取”一个任务来执行。
 
 ## Fork/Join的实现原理
-####　Fork/Join的结构
+
+###　Fork/Join的结构
 Fork/Join框架主要由如下两部分组成：
 
 * ForkJoinPool：即Fork/Join的线程池，是AbstractExecutorService抽象类的一个子类。
@@ -23,7 +24,7 @@ Fork/Join框架主要由如下两部分组成：
 	* RecursiveAction：处理没有返回结果的任务。
 	* RecursiveTask：处理有返回结果的任务。
 
-#### ForkJoinPool原理
+### ForkJoinPool原理
 先说明下，这里的所有的代码都是基于**JDK 1.8版本**。
 ``` java
 	public class ForkJoinPool extends AbstractExecutorService {
@@ -122,7 +123,7 @@ submit()方法包含两步：
 ```
 上述这段代码有些参数和判断暂时没看太明白，但是总体的思路大致是这样的：首先从全局的工作线程队列中随机获取一个工作线程的WorkQueue对象q，然后从q中获取其工作队列的引用，将新的任务插入到当前工作线程的双端队列头。
 
-## ForkJoinTask原理
+### ForkJoinTask原理
 ForkJoinTask有两个关键的方法，一个是fork()，这个方法是提交任务到当前线程的工作队列中；另外一个是join()，该方法是获取当前任务的结果。
 #### fork()方法
 ``` java
