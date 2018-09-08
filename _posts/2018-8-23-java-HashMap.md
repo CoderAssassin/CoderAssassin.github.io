@@ -11,6 +11,7 @@ tags:
 ## HashMap
 HashMap和HashTable很像，也是采用“键-值”的方式存储数据，底层也是采用的数组+链表的数据结构。
 HashMap集成自AbstractMap抽象类，AbstractMap是对Map接口的实现，里边定义了常用的contaninsKey()，containsValue()等方法；HashMap同样实现了Map<K,V>, Cloneable, Serializable接口。
+**注意：下面的代码是在JDK 1.8下。**
 
 #### HashMap和HashTable的区别
 * 集成的抽象类不同，HashTable继承自Dictionary，HashMap继承自AbstractMap抽象类。
