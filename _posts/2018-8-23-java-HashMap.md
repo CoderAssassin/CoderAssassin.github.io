@@ -76,6 +76,7 @@ static final int tableSizeFor(int cap) {
         return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
     }
 ```
+上述代码中间一系列的按位或的操作之后，最终是将cap的最左边的1往右的所有的0变成了1，这样的话再加1得到的就是大于等于cap的最小二次幂。比如，cap=1010(10)，那么减1就是1001(9)，或运算后就是1111(15)，最终加1为10000(16)。
 
 #### HashMap的主要方法
 * get方法
