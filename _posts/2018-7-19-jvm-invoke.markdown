@@ -173,8 +173,9 @@ father choose 360
 son choose qq
 ```
 上述代码编译阶段编译器的目标方法选择，也就是静态分派过程，依据：
-	* 静态类型是Father还是Son。
-	* 方法参数是QQ还是360。
+
+* 静态类型是Father还是Son。
+* 方法参数是QQ还是360。
 上述代码中的两个变量father和son在编译过程中，根据"="左边确定静态类型都是Father类型，因此Class文件中写的Father类中的方法的符号引用，然后对于参数，根据静态类型匹配原则可以直接找到Father类中的方法的符号引用，结果是产生两条指令invokevirtual指令，指向`Father.hardChoice(360)`和`Father.hardChoice(QQ)`，根据两个宗量，是多分派。
 对于`son.hardChoice(new QQ())`编译期已经确定目标方法签名为`hardChoice(QQ)`，运行阶段不关心传递的参数，影响选择的因素是接受者是Father还是QQ，在运行期间发现实际类型是Son类，所以会调用Son类中的方法(而father变量因为实际类型和静态类型一样，不需要换)，根据一个宗量，是单分派。
 
