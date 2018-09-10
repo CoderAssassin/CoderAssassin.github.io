@@ -34,7 +34,7 @@ public static Object getLast(Vector list){
         int lastIndex=list.size()-1;
         return list.get(lastIndex);
     }
-}
+}确保
 public static void deleteLast(Vector list){
     synchronized(list){
         int lastIndex=list.size()-1;
@@ -59,8 +59,9 @@ synchronized(vector){
 #### 迭代器与ConcurrentModificationException(fail-fast)
 容器类在迭代的时候当发现容器在迭代的过程中被修改时，会抛出ConcurrentModificationException异常。
 避免方式：
-	* 一种是在迭代期间对容器加锁，但是若迭代周期很长，其他线程将会等待很长时间。
-	* 另外一种方法是“克隆”容器，在线程副本上迭代，因为副本是封闭在线程内的，其他线程不会在迭代期间对其进行修改。
+
+* 一种是在迭代期间对容器加锁，但是若迭代周期很长，其他线程将会等待很长时间。
+* 另外一种方法是“克隆”容器，在线程副本上迭代，因为副本是封闭在线程内的，其他线程不会在迭代期间对其进行修改。
 
 #### 隐藏迭代器
 ```
@@ -98,8 +99,9 @@ public class HiddenIterator {
 #### CopyOnWriteArrayList
 * 用于替代同步List，在迭代期间不需要对容器进行加锁或复制
 * “写入时复制”安全性：通俗的理解是当我们往一个容器添加元素的时候，不直接往当前容器添加，而是先将当前容器进行Copy，复制出一个新的容器，然后新的容器里添加元素，添加完元素之后，再将原容器的引用指向新的容器。这样做的好处是我们可以对CopyOnWrite容器进行并发的读，而不需要加锁，因为当前容器不会添加任何元素。所以CopyOnWrite容器也是一种读写分离的思想，读和写不同的容器。
-
+	
 ## 阻塞队列和生产者-消费模式
+
 ####　阻塞队列
 BlockingQueue的put和take方法会引起阻塞，使用阻塞机制可以实现将BlockingQueue作为池，put为生产，take为消费，简单的"生产者-消费者"模式。
 BlockingQueue有多种实现，LinkedBlockingQueue和ArrayBlockingQueue，还有PriorityBlockingQueue。
