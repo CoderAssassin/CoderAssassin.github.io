@@ -354,6 +354,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
         //若是再次创建同样的bean，那么这里不不需要再寻找构造函数
 		if (resolved) {
+			//如果构造函数使用@Autowire对参数进行注入，那么调用autowireNecessary()对bean进行创建
 			if (autowireNecessary) {
 				return autowireConstructor(beanName, mbd, null, null);
 			}
