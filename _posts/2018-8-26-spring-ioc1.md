@@ -354,7 +354,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
         //若是再次创建同样的bean，那么这里不不需要再寻找构造函数
 		if (resolved) {
-			//如果构造函数使用@Autowire对参数进行注入，那么调用autowireNecessary()对bean进行创建
+        	//如果构造函数使用@Autowire对参数进行注入，那么调用autowireNecessary()对bean进行创建
 			if (autowireNecessary) {
 				return autowireConstructor(beanName, mbd, null, null);
 			}
@@ -402,32 +402,28 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 	}
 ```
-总结一下上述代码，在createBean()中，会解析BeanDefinition得到所属类的Class对象，封装到BeanDefinition中，接下来判断bean是否设置了PostProcessor，是的话那么会返回该bean的代理proxy对象；否则的话，会调用doCreateBean()真正创建bean。在doCreateBean()中，会用**BeanWrapper**对象来封装创建后的bean，若bean是单例，那么会尝试从单例缓存中获取并删除缓存中同名bean；不是单例的话，调用**createBeanInstance()**创建bean，createBeanInstance()里是真正创建bean的地方。这里会首先获得bean所属类的Class对象，然后根据不同的初始化方案，采用工厂方法或者构造函数来对bean进行初始化，对于采用构造函数进行初始化，会根据不同的初始化策略来进行初始化。这里的关键方法是**getInstantiationStrategy().instantiate()，这里就是真正用到代理来实例化bean的地方了**。需要调用**InstantiationStrategy**的instantiate()方法，由具体的子类来实现，具体代码在子类**SimpleInstantiationStrategy**类中:
+总结一下上述代码，在createBean()中，会解析BeanDefinition得到所属类的Class对象，封装到BeanDefinition中，接下来判断bean是否设置了PostProcessor，是的话那么会返回该bean的代理proxy对象；否则的话，会调用doCreateBean()真正创建bean。在doCreateBean()中，会用**BeanWrapper**对象来封装创建后的bean，若bean是单例，那么会尝试从单例缓存中获取并删除缓存中同名bean；不是单例的话，调用**createBeanInstance()**创建bean，createBeanInstance()里是真正创建bean的地方。这里会首先获得bean所属类的Class对象，然后根据不同的初始化方案，采用工厂方法或者构造函数来对bean进行初始化，对于采用构造函数进行初始化，会根据不同的初始化策略来进行初始化。这里的关键方法是**getInstantiationStrategy().instantiate()，这里就是真正用到代理来实例化bean的地方了，默认是调用CglibSubclassingInstantiationStrategy的instantiate()方法对bean进行实例化，instantiate()方法的实现是在父类SimpleInstantiationStrategy中实现**。
 ``` java
 public class SimpleInstantiationStrategy implements InstantiationStrategy {
-	public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner) {
-		// Don't override the class with CGLIB if no overrides.
-		if (bd.getMethodOverrides().isEmpty()) {
+	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
+		// 若bean标签下没有lookup-method或者replace-method这些标签，那么直接使用构造器反射创建bean对象
+		if (!bd.hasMethodOverrides()) {
 			Constructor<?> constructorToUse;
+            //下面的工作就是过去构造器，主要是通过反射的方式获得
 			synchronized (bd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse == null) {
 					final Class<?> clazz = bd.getBeanClass();
-					if (clazz.isInterface()) {//使用CGLIB不能对接口代理
+					if (clazz.isInterface()) {
 						throw new BeanInstantiationException(clazz, "Specified class is an interface");
 					}
 					try {
 						if (System.getSecurityManager() != null) {
-							constructorToUse = AccessController.doPrivileged(new PrivilegedExceptionAction<Constructor<?>>() {
-								@Override
-								public Constructor<?> run() throws Exception {
-                                //安全模式下使用反射来获取构造器返回
-									return clazz.getDeclaredConstructor((Class[]) null);
-								}
-							});
+							constructorToUse = AccessController.doPrivileged(
+									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
-							constructorToUse =	clazz.getDeclaredConstructor((Class[]) null);
+							constructorToUse =	clazz.getDeclaredConstructor();
 						}
 						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
 					}
@@ -436,11 +432,11 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
-            //通过BeanUtils使用JVM反射来实例化bean对象
+           	//使用获得的构造器进行实例化bean
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
-			// 使用CGLIB代理来实例化对象
+			// 如果有lookup-method或者replace-method，那么需要创建cglib代理，然后再使用构造器进行创建
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
 	}
@@ -467,8 +463,10 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
     //----------CGLIB方式实例化，最终是在CglibSubclassingInstantiationStrategy类的静态内部类CglibSubclassCreator中的instantiate方法中创建
     public Object instantiate(Constructor<?> ctor, Object... args) {
-			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);//调用CGLIB的代理过程
+    		//使用CGLIB的Enhancer创建代理子类
+			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
 			Object instance;
+            //下面还是使用的构造器进行实例创建
 			if (ctor == null) {
 				instance = BeanUtils.instantiateClass(subclass);
 			}
@@ -482,8 +480,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 							"Failed to invoke constructor for CGLIB enhanced subclass [" + subclass.getName() + "]", ex);
 				}
 			}
-			// SPR-10785: set callbacks directly on the instance instead of in the
-			// enhanced class (via the Enhancer) in order to avoid memory leaks.
+			// 将创建的bean实例转为factory，设置回调和拦截器，LookupOverrideMethodInterceptor是对lookup-method的拦截，ReplaceOverrideMethodInterceptor是对replace-method的拦截
 			Factory factory = (Factory) instance;
 			factory.setCallbacks(new Callback[] {NoOp.INSTANCE,
 					new LookupOverrideMethodInterceptor(this.beanDefinition, this.owner),
@@ -504,26 +501,29 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			return enhancer.createClass();
 		}
 ```
-总结下上述代码，上述代码是SimpleInstantiationStrategy中的实例化策略，这里分为两种实例化方式，分别是**利用JVM反射来创建实例；利用CGLIB动态代理来创建实例**。若用反射的话，借用的BeanUtils，实质上是调用构造器的newInstance()；若使用的CGLIB动态代理的话，最终是在CglibSubclassingInstantiationStrategy类的静态内部类CglibSubclassCreator中的instantiate方法中创建。
+总结下上述代码，上述代码是SimpleInstantiationStrategy中的实例化策略，这里根据bean的配置中是否有lookup-method或者replace-method标签设置将创建方式分成两种：
+
+* 若没有上述两个标签，那么直接获取构造器，然后使用构造器创建bean。对应的是
+* 如果有标签，那么真正创建是在CglibSubclassingInstantiationStrategy类的静态内部类CglibSubclassCreator中的instantiate方法中创建。该方式的不同之处在于，会使用CGLIB动态代理创建代理子类，然后使用子类的构造器创建bean实例，并且设置回调方法和拦截器
 
 继续doCreateBean()方法，现在我们createBeanInstance()方法完成以后得到了bean的实例对象(封装成BeanWrapper对象)，接下来还有一个重要的方法是**populateBean()**，该方法是完成bean的依赖注入的入口，看下面AbstractAutowireCapableBeanFactory中代码：
 ```java
 	protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper bw) {
 		PropertyValues pvs = mbd.getPropertyValues();//获得所有属性值
-
+		//bw为空的话，那么抛异常或者返回
 		if (bw == null) {
 			if (!pvs.isEmpty()) {
 				throw new BeanCreationException(
 						mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
 			}
 			else {
-				// Skip property population phase for null instance.
+				// 属性值为空那么直接范围
 				return;
 			}
 		}
 
 		boolean continueWithPropertyPopulation = true;
-
+		//在注入前，对bean实例的属性进行自定义的处理，调用BeanPostProcessor
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
@@ -539,7 +539,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		if (!continueWithPropertyPopulation) {
 			return;
 		}
-        //处理autowire注入
+        //处理未解析的使用autowire注入的属性
 		if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_NAME ||
 				mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
@@ -560,6 +560,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		boolean needsDepCheck = (mbd.getDependencyCheck() != RootBeanDefinition.DEPENDENCY_CHECK_NONE);
 
+		//调用后处理器
 		if (hasInstAwareBpps || needsDepCheck) {
 			PropertyDescriptor[] filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
 			if (hasInstAwareBpps) {
@@ -577,7 +578,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				checkDependencies(beanName, mbd, filteredPds, pvs);
 			}
 		}
-        //对属性值进行注入
+        //对剩余的属性值进行解析注入
 		applyPropertyValues(beanName, mbd, bw, pvs);
 	}
     //具体对属性进行注入
@@ -597,8 +598,8 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
         //可操作属性值
 		if (pvs instanceof MutablePropertyValues) {
 			mpvs = (MutablePropertyValues) pvs;
+            //如果属性值的引用都已经转化成具体的实例，那么直接设置属性值并返回
 			if (mpvs.isConverted()) {
-				// 尝试设置属性值
 				try {
 					bw.setPropertyValues(mpvs);
 					return;
@@ -618,6 +619,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		if (converter == null) {
 			converter = bw;
 		}
+        //获取值解析器
 		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this, beanName, mbd, converter);//创建值解析器
 
 		// Create a deep copy, resolving any references for values.
@@ -628,10 +630,10 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			if (pv.isConverted()) {
 				deepCopy.add(pv);
 			}
-			else {//如果属性值没有进行转换，那么转换
+			else {
 				String propertyName = pv.getName();
 				Object originalValue = pv.getValue();
-				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);//这里对值进行解析
+				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);//关键，调用resolveValueIfNecessary()进行值转换
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) &&
 						!PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
@@ -663,7 +665,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		}
 
 		try {
-        	//最终注入解析后的属性值
+        	//关键，前面都是转换，这里是最终注入解析后的属性值
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		}
 		catch (BeansException ex) {
@@ -682,8 +684,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 ``` java
 	//这个方法里根据不同类型的属性值，然后进行解析
 	public Object resolveValueIfNecessary(Object argName, Object value) {
-		// We must check each value to see whether it requires a runtime reference
-		// to another bean to be resolved.
+		// 解析运行时引用
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			return resolveReference(argName, ref);
