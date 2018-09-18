@@ -32,6 +32,7 @@ static class Entry<K,V> implements Map.Entry<K,V> {
 ### 总体设计
 ![concurrentHashMap1](https://github.com/CoderAssassin/markdownImg/blob/master/concurrentHashmap.png?raw=true "concurrentHashMap1.6/1.7")
 采用分段锁的设计，同一个分段内的数据存在竞争，不同分段内的数据不存在竞争，并没有对整个Map数组进行加锁。ConcurrentHashMap存储有多个分段锁，每个分段锁内部有一个数组，数组的每个元素是HashEntry，从数组的元素的next指针找下去形成一条链表。
+
 ``` java
 static final class HashEntry<K,V> {
         final int hash;
@@ -39,7 +40,8 @@ static final class HashEntry<K,V> {
         volatile V value;
         volatile HashEntry<K,V> next;
         }
-        ```
+```
+
 > key和value不能为null，若为null说明当前线程没有处理完而被其他线程看到。
 
 ### 重要参数
