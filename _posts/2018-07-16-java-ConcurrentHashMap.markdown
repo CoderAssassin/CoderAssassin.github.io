@@ -8,7 +8,7 @@ header-img: "img/post-bg-db-concurrent.jpg"
 tags:
     - Java
 ---
-# ConcurrentHashMap理解
+## ConcurrentHashMap理解
 这几天看了一些关于ConcurrentHashMap的文章，加深了理解，写篇简短的总结记录一下，免得下一次又得再找别人的文章。
 ConcurrentHashMap在JDK 1.6、1.7和1.8有差别，尤其是JDK 1.8版本变化较大，JDK 1.6、1.7版本都是采用的分段锁(Segment (继承ReentrantLock))来实现对部分数据加锁，而在1.8中，进行了重新设计，加入了Node、TreeNode和TreeBin等数据结构。
 ## 预知识：HashMap
@@ -30,7 +30,9 @@ static class Entry<K,V> implements Map.Entry<K,V> {
 
 ## Jdk 1.6、1.7的设计
 ### 总体设计
+
 ![concurrentHashMap1](https://github.com/CoderAssassin/markdownImg/blob/master/concurrentHashmap.png?raw=true "concurrentHashMap1.6/1.7")
+
 采用分段锁的设计，同一个分段内的数据存在竞争，不同分段内的数据不存在竞争，并没有对整个Map数组进行加锁。ConcurrentHashMap存储有多个分段锁，每个分段锁内部有一个数组，数组的每个元素是HashEntry，从数组的元素的next指针找下去形成一条链表。
 
 ``` java
