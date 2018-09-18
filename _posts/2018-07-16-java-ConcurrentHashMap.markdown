@@ -13,6 +13,7 @@ tags:
 ConcurrentHashMap在JDK 1.6、1.7和1.8有差别，尤其是JDK 1.8版本变化较大，JDK 1.6、1.7版本都是采用的分段锁(Segment (继承ReentrantLock))来实现对部分数据加锁，而在1.8中，进行了重新设计，加入了Node、TreeNode和TreeBin等数据结构。
 ## 预知识：HashMap
 基本数据结构使用Entry，创建一个Entry数组，每个位置处是一个链表。
+
 ``` java
 static class Entry<K,V> implements Map.Entry<K,V> {
         final K key;
@@ -24,6 +25,7 @@ static class Entry<K,V> implements Map.Entry<K,V> {
 
 当出现哈希碰撞的时候，采用链地址法解决冲突。
 1.7版本使用的是链表，1.8版本使用的是红黑树，当节点个数大于8个的时候，转换为红黑树。
+
 > 允许一个key为null，value为null的Entry，放到位置0处。
 
 ## Jdk 1.6、1.7的设计
