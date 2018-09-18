@@ -115,7 +115,7 @@ segmentShift表示并发度从高位到最高位1(包含)的位数，segmentMask
         // 1. 计算 key 的 hash 值
         int hash = hash(key);
         // 2. 根据 hash 值找到 Segment 数组中的位置 j
-        //    hash 是 32 位，无符号右移 segmentShift(28) 位，剩下低 4 位，
+        //    hash 是 32 位，无符号右移 segmentShift(28) 位，剩下高 4 位，
         //    然后和 segmentMask(15) 做一次与操作，也就是说 j 是 hash 值的最后 4 位，也就是槽的数组下标
         int j = (hash >>> segmentShift) & segmentMask;
         if ((s = (Segment<K,V>)UNSAFE.getObject
