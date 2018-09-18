@@ -126,8 +126,8 @@ segmentShift表示并发度从高位到最高位1(包含)的位数，segmentMask
     }
 ```
 上述代码主要流程如下：
-* 根据key计算hash值
-* 根据hash值右移segmentShift位后与segmentMask做与运算得到Segment数组的索引下标
+* 根据key计算hash值，类似HashMap，将高16位与低16位做异或运算
+* 根据hash值右移segmentShift位后与segmentMask做与运算得到Segment数组的索引下标。**HashMap使用的是低位定位数组索引下表，而ConcurrentHashMap使用的是高位定位数组索引下标。**
 * 判断Segment是否初始化，没有的话调用**ensureSegment()**方法初始化Segment数组
 
 接下来看一下ensureSegment()方法：
