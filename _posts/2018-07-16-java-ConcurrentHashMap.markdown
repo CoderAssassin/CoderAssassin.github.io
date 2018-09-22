@@ -275,22 +275,25 @@ private void rehash(HashEntry<K,V> node) {
                if (e != null) {
                    HashEntry<K,V> next = e.next;
                    int idx = e.hash & sizeMask;
-                   if (next == null)   //  链表只有1个实体的情况
+                   //数组下标处只有一个元素
+                   if (next == null)
                        newTable[idx] = e;
-                   else { // 链表有多个实体的情况
+                   else { //实体下标处是个链表
                        HashEntry<K,V> lastRun = e;
                        int lastIdx = idx;
+                       //从头到尾遍历，找到hash值不同的最后的位置，反过来说，从lastRun处的元素开始往后所有的元素的hash都是相等的，因此接下来的for循环是处理lastRun前面的元素，将它们的位置重新安放
                        for (HashEntry<K,V> last = next;
                             last != null;
-                            last = last.next) {//遍历到链表尾
+                            last = last.next) {
                            int k = last.hash & sizeMask;
                            if (k != lastIdx) {
                                lastIdx = k;
                                lastRun = last;
                            }
                        }
-                       newTable[lastIdx] = lastRun;
-                       for (HashEntry<K,V> p = e; p != lastRun; p = p.next) {//以链表尾节点作为终止标记，将前面所有实体重新插入新的数组
+                       newTable[lastIdx] = lastRun;//现将不变的链表部分存入新的数组
+                       //将lastRun往前的链表里的实体节点重新hash到lastIndex所在的链表里，然后在头部插入新的元素
+                       for (HashEntry<K,V> p = e; p != lastRun; p = p.next) {
                            V v = p.value;
                            int h = p.hash;
                            int k = h & sizeMask;
@@ -300,14 +303,19 @@ private void rehash(HashEntry<K,V> node) {
                    }
                }
            }
-           //将新的实体插入新数组对应的链表头
-           int nodeIndex = node.hash & sizeMask; // add the new node
+           //扩容之后，将新的节点插入
+           int nodeIndex = node.hash & sizeMask;
            node.setNext(newTable[nodeIndex]);
            newTable[nodeIndex] = node;
            table = newTable;
        }
 ```
-扩容是针对HashEntry数组的，将数组长度扩大为原来的两倍；然后遍历旧数组，将下标i处的链表实体整个重新hash到新数组的i位置处或者i+oldCap处。
+扩容是针对HashEntry数组的，将数组长度扩大为原来的两倍。扩容的时候，首先是遍历旧的HashEntry数组，在处理具体某个索引下标处的元素e的时候做如下两件事：
+
+* 根据e的hash&sizeMask计算下标索引，若e并不是链表，那么直接在新数组插入元素e；若e是链表，做如下两件事：
+	* 第一次循环遍历链表，找到第一个hash值不再变化的元素下标lastIdx
+	* 第二次循环遍历链表，从元素e遍历到lastIdx之前，在新数组的对应位置的头部插入新的元素
+* 插入新的元素
 
 ### get方法
 ``` java
