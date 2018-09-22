@@ -529,7 +529,7 @@ get()方法相比于put方法简单很多，主要分为如下几步：
 	private final void treeifyBin(Node<K,V>[] tab, int index) {
         Node<K,V> b; int n, sc;
         if (tab != null) {
-            //若数组长度小于64，那么进行的是数组扩容
+            //若数组长度小于64，那么将数组扩大为原来的两倍，充分分配元素的位置
             if ((n = tab.length) < MIN_TREEIFY_CAPACITY)
                 tryPresize(n << 1);
             //否则转换为红黑树
@@ -563,33 +563,35 @@ get()方法相比于put方法简单很多，主要分为如下几步：
 ``` java
 	//size是翻倍后的数组大小
     private final void tryPresize(int size) {
-        // 1.5*size+1，往上取最近的2的n次方
+        // 1.5*size+1，取大于等于该值的最小二次幂值
         int c = (size >= (MAXIMUM_CAPACITY >>> 1)) ? MAXIMUM_CAPACITY :
             tableSizeFor(size + (size >>> 1) + 1);
         int sc;
+        //sizeCtl大于等于0表示未初始化或者扩容
         while ((sc = sizeCtl) >= 0) {
             Node<K,V>[] tab = table; int n;
-            //数组为null的话初始化数组，类似initTable
+            //情况一：现有数组为空，那么初始化
             if (tab == null || (n = tab.length) == 0) {
-                n = (sc > c) ? sc : c;
-                if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
+                n = (sc > c) ? sc : c;//新数组的大小在c和sc中取大者
+                if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {//令SIZECTL=-1，表示正在初始化
                     try {
                         if (table == tab) {
                             @SuppressWarnings("unchecked")
                             Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n];
                             table = nt;
-                            sc = n - (n >>> 2); // 0.75 * n
+                            sc = n - (n >>> 2);
                         }
                     } finally {
-                        sizeCtl = sc;
+                        sizeCtl = sc;//设置sizeCtl为0.75*n，作为下一次扩容的大小
                     }
                 }
             }
-            else if (c <= sc || n >= MAXIMUM_CAPACITY)//还没有达到下一次的更新点，或者数组长度已经超了
+            //情况二：数组没有达到扩容的标准(threshold)或者无法继续扩容，那么直接退出
+            else if (c <= sc || n >= MAXIMUM_CAPACITY)
                 break;
+            //情况三：正常扩容动作，这个判断条件是确定有没有扩容完毕
             else if (tab == table) {
-                int rs = resizeStamp(n);
-
+                int rs = resizeStamp(n);//根据n不同生成不同的生成戳，用来作为不同次扩容的标记
                 if (sc < 0) {
                     Node<K,V>[] nt;
                     if ((sc >>> RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
@@ -599,6 +601,7 @@ get()方法相比于put方法简单很多，主要分为如下几步：
                     if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
                         transfer(tab, nt);
                 }
+                //还未初始化
                 else if (U.compareAndSwapInt(this, SIZECTL, sc,
                                              (rs << RESIZE_STAMP_SHIFT) + 2))
                     transfer(tab, null);
