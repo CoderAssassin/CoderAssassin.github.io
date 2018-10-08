@@ -45,8 +45,7 @@ CAP定理是NOSQL数据库的基石，指的是在一个分布式系统中，Con
 
 * 阶段一：准备阶段。事务协调器向所有的参与者发送事务的内容，所有的参与者执行事务内容，执行成功的参与者反馈YES；否则反馈NO，表示是否可以提交事务。
 * 阶段二：提交阶段。若阶段一所有参与者均反馈YES，那么事务协调器向所有的参与者发送提交请求，所有参与者提交事务后返回Ack消息，如果收到所有的参与者的Ack消息说明事务提交成功；如果有一个参与者反馈NO，那么事务协调器发送回滚事务的请求，所有参与者回滚事务后返回Ack消息，事务协调器收到所有参与者的Ack消息说明中断完成。
-![2pc-success](https://github.com/CoderAssassin/markdownImg/blob/master/JavaConcurrent/2pc.jpg?raw=true)
-![2pc-fail](https://github.com/CoderAssassin/markdownImg/blob/master/JavaConcurrent/2pc1.jpg?raw=true)
+  ![2pc-success](https://github.com/CoderAssassin/markdownImg/blob/master/JavaConcurrent/2pc.jpg?raw=true)
 
 优点：
 
