@@ -102,7 +102,7 @@ public class HiddenIterator {
 	
 ## 阻塞队列和生产者-消费模式
 
-####　阻塞队列
+#### 阻塞队列
 BlockingQueue的put和take方法会引起阻塞，使用阻塞机制可以实现将BlockingQueue作为池，put为生产，take为消费，简单的"生产者-消费者"模式。
 BlockingQueue有多种实现，LinkedBlockingQueue和ArrayBlockingQueue，还有PriorityBlockingQueue。
 
