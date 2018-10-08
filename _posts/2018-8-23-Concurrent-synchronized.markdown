@@ -118,7 +118,7 @@ JVM中，对象的组成有如下几个部分：
 如下图表示对象头第一部分在不同锁情况下的存储信息分布：
 ![markword](https://github.com/CoderAssassin/markdownImg/blob/master/Java/markword.jpg?raw=true)
 * 实例数据：存储对象的数据
-* 对其填充：因为JVM规定对象的起始地址需要是8字节的整数倍，所以这里需要填充。
+* 对齐填充：因为JVM规定对象的起始地址需要是8字节的整数倍，所以这里需要填充。
 
 #### synchronized的优化
 synchronized是一个重量级的锁，因为监视器锁monitor的底层使用的是操作系统的互斥所Mutex Lock实现，操作系统实现线程之间的切换需要从用户态转换到核心态，切换需要很长时间。JDK 1.6以后，引入了轻量级锁和偏向锁的概念之后，对synchronized进行了优化。
