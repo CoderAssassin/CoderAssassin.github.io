@@ -17,9 +17,9 @@ HashMap集成自AbstractMap抽象类，AbstractMap是对Map接口的实现，里
 * 集成的抽象类不同，HashTable继承自Dictionary，HashMap继承自AbstractMap抽象类。
 * HashMap是非线程安全的，HashTable是线程安全的，体现在HashTable的各个方法都有synchronized加锁。
 * HashTable的键和值都不能为null，HashMap中可以有1个null键，若get()返回null，可能是没有该键，或者值为null，所以需要使用containsKey()来判断是否有某个键。
-* 遍历方式不同，HashMap和HashTable都使用的是Iterator，但是因为历史原因，HashTable还使用了Enumeration方式
+* 遍历方式不同，HashMap和HashTable都使用的是Iterator，但是因为历史原因，HashTable还使用了Enumeration方式C
 * JDK1.8之后HashTable才采用的fast-fail机制，HashMap一直有
-* HashTable的默认初始容量为11，扩容方式为2*oldCapacity+1，若构造函数中设定初始值，那么数组长度就是该初始值；在HashMap中，默认初始容量为16，扩容方式为oldCapacity*2，如果构造函数中传入自定义的初始容量，那么会取大于等于该值的最小的2的幂值来作为初始容量。
+* HashTable的默认初始容量为11，扩容方式为2\*oldCapacity+1，若构造函数中设定初始值，那么数组长度就是该初始值；在HashMap中，默认初始容量为16，扩容方式为oldCapacity\*2，如果构造函数中传入自定义的初始容量，那么会取大于等于该值的最小的2的幂值来作为初始容量。
 * hash值计算方式不同，HashTable直接用对象的hashCode做与运算，再取模；HashMap用的是位运算，效率高。
 
 #### HashMap的重要参数
