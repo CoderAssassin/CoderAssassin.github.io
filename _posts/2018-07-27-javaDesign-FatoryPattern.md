@@ -134,11 +134,11 @@ public class ComponentFactory implements IComponentFatory{
                 message.put("componentName","内存");
                 break;
             case "cpu":
-                component=new Memory();
+                component=new CPU();
                 message.put("componentName","cpu");
                 break;
             default:
-                component=new Memory();
+                component=new Graphics();
                 message.put("componentName","显卡");
                 break;
         }
